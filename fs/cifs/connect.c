@@ -1209,8 +1209,10 @@ next_pdu:
 
 		if (server->ops->next_header) {
 			next_offset = server->ops->next_header(buf);
-			if (next_offset)
+			if (next_offset) {
 				server->pdu_size = next_offset;
+				cifs_dbg(FYI, "next_offset=%d\n", next_offset);
+			}
 		}
 
 		memset(mids, 0, sizeof(mids));
@@ -1234,6 +1236,7 @@ next_pdu:
 			else
 				length = mids[0]->receive(server, mids[0]);
 		}
+		cifs_dbg(FYI, "initial recv length=%d\n", length);
 
 		if (length < 0) {
 			for (i = 0; i < num_mids; i++)
@@ -1256,7 +1259,12 @@ next_pdu:
 
 		for (i = 0; i < num_mids; i++) {
 			if (mids[i] != NULL) {
+				cifs_dbg(FYI, "mids[%d] mid=%lld\n",
+					 i, mids[i]->mid);
+
 				mids[i]->resp_buf_size = server->pdu_size;
+				cifs_dbg(FYI, "mids[%d] resp_buf_size=%d\n",
+					 i, mids[i]->resp_buf_size);
 
 				if (bufs[i] && server->ops->is_network_name_deleted)
 					server->ops->is_network_name_deleted(bufs[i],
