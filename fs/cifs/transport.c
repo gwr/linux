@@ -1692,6 +1692,7 @@ cifs_readv_receive(struct TCP_Server_Info *server, struct mid_q_entry *mid)
 
 	cifs_dbg(FYI, "%s: mid=%llu offset=%llu bytes=%u\n",
 		 __func__, mid->mid, rdata->offset, rdata->bytes);
+	cifs_dbg(FYI, " server pdu_size=%d\n", server->pdu_size);
 
 	/*
 	 * read the rest of READ_RSP header (sans Data array), or whatever we

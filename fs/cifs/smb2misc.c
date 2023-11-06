@@ -227,8 +227,8 @@ smb2_check_message(char *buf, unsigned int len, struct TCP_Server_Info *server)
 	}
 
 	calc_len = smb2_calc_size(buf);
-	cifs_dbg(FYI, "%s: mid=%lld calc_len=%d\n",
-		__func__, mid, calc_len);
+	cifs_dbg(FYI, "%s: mid=%lld len=%d calc_len=%d\n",
+		__func__, mid, len, calc_len);
 
 	/* For SMB2_IOCTL, OutputOffset and OutputLength are optional, so might
 	 * be 0, and not a real miscalculation */

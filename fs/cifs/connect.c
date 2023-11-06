@@ -1048,6 +1048,8 @@ standard_receive3(struct TCP_Server_Info *server, struct mid_q_entry *mid)
 	char *buf = server->smallbuf;
 	unsigned int pdu_length = server->pdu_size;
 
+	cifs_dbg(FYI, "%s: pdu_length=%d\n", __func__, pdu_length);
+
 	/* make sure this will fit in a large buffer */
 	if (pdu_length > CIFSMaxBufSize + MAX_HEADER_SIZE(server) -
 	    HEADER_PREAMBLE_SIZE(server)) {
@@ -1198,6 +1200,7 @@ cifs_demultiplex_thread(void *p)
 			continue;
 next_pdu:
 		server->pdu_size = pdu_length;
+		cifs_dbg(FYI, "pdu_length=%d\n", pdu_length);
 
 		/* make sure we have enough to get to the MID */
 		if (server->pdu_size < MID_HEADER_SIZE(server)) {
@@ -1303,6 +1306,8 @@ next_pdu:
 		}
 
 		if (pdu_length > server->pdu_size) {
+			cifs_dbg(FYI, "%s: pdu_length %d subtract %d\n",
+				__func__, pdu_length, server->pdu_size);
 			if (!allocate_buffers(server))
 				continue;
 			pdu_length -= server->pdu_size;
