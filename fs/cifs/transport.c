@@ -1244,6 +1244,7 @@ compound_send_recv(const unsigned int xid, struct cifs_ses *ses,
 
 		rc = server->ops->check_receive(midQ[i], server,
 						     flags & CIFS_LOG_ERROR);
+		cifs_dbg(FYI, "send_resv, check=%d\n", rc);
 
 		/* mark it so buf will not be freed by delete_mid */
 		if ((flags & CIFS_NO_RSP_BUF) == 0)
@@ -1702,6 +1703,7 @@ cifs_readv_receive(struct TCP_Server_Info *server, struct mid_q_entry *mid)
 
 	length = cifs_read_from_socket(server,
 				       buf + HEADER_SIZE(server) - 1, len);
+	cifs_dbg(FYI, "%s: read sock want %d got %d\n", __func__, len, length);
 	if (length < 0)
 		return length;
 	server->total_read += length;

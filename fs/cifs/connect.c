@@ -388,6 +388,7 @@ static int __cifs_reconnect(struct TCP_Server_Info *server,
 	cifs_mark_tcp_ses_conns_for_reconnect(server, mark_smb_session);
 
 	cifs_abort_connection(server);
+	dump_stack();
 
 	do {
 		try_to_freeze();
@@ -757,11 +758,15 @@ int
 cifs_read_from_socket(struct TCP_Server_Info *server, char *buf,
 		      unsigned int to_read)
 {
+	int rc;
 	struct msghdr smb_msg = {};
 	struct kvec iov = {.iov_base = buf, .iov_len = to_read};
 	iov_iter_kvec(&smb_msg.msg_iter, READ, &iov, 1, to_read);
 
-	return cifs_readv_from_socket(server, &smb_msg);
+	rc = cifs_readv_from_socket(server, &smb_msg);
+	cifs_dbg(FYI, "read from socket want %d got %d\n",
+                       to_read, rc);
+	return (rc);
 }
 
 ssize_t
@@ -1086,9 +1091,12 @@ cifs_handle_standard(struct TCP_Server_Info *server, struct mid_q_entry *mid)
 	 * into the payload for debugging purposes.
 	 */
 	rc = server->ops->check_message(buf, server->total_read, server);
-	if (rc)
+	if (rc) {
+		cifs_dbg(FYI, "Bad SMB msg, mid=%lld\n",
+		    (mid) ? mid->mid : 0);
 		cifs_dump_mem("Bad SMB: ", buf,
 			min_t(unsigned int, server->total_read, 48));
+	}
 
 	if (server->ops->is_session_expired &&
 	    server->ops->is_session_expired(buf)) {
