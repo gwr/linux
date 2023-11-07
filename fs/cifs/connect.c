@@ -1107,8 +1107,10 @@ cifs_handle_standard(struct TCP_Server_Info *server, struct mid_q_entry *mid)
 	}
 
 	if (server->ops->is_status_pending &&
-	    server->ops->is_status_pending(buf, server))
-		return -1;
+	    server->ops->is_status_pending(buf, server)) {
+		cifs_dbg(FYI, "%s: mid %lld is pending\n",
+			__func__, mid->mid);
+	}
 
 	if (!mid)
 		return rc;
